@@ -11,15 +11,31 @@ I started this fork to submit a pull request against upstream when I realized th
 
 ## Getting Started
 
+I suggest installing the assistant only in local scope inside its own workspace.
+
+1. Create a workspace
 ```bash
-claude plugin marketplace add christian-drescher/claudeclaw
-claude plugin install claudeclaw
+mkdir workspace && cd workspace
+```
+
+2. Install marketplace and plugin with local scope
+```bash
+claude plugin marketplace add christian-drescher/claudeclaw --scope local
+claude plugin install claudeclaw --scope local
 ```
 Then open a Claude Code session and run:
 ```
 /claudeclaw:start
 ```
 The setup wizard walks you through model, heartbeat, Telegram, and security, then your daemon is live with a web dashboard.
+
+## Update
+
+Change directory into the assistant's workspace and then
+
+```bash
+claude plugin update claudeclaw@claudeclaw --scope local
+```
 
 ## Features
 
