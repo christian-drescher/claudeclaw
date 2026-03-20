@@ -34,10 +34,9 @@ ${pageStyles}
     href="https://github.com/moazbuilds/claudeclaw"
     target="_blank"
     rel="noopener noreferrer"
-    aria-label="Star claudeclaw on GitHub"
+    aria-label="ClaudeClaw on GitHub"
   >
-    <span class="repo-text">Like ClaudeClaw? Star it on GitHub</span>
-    <span class="repo-star">★</span>
+    <span class="repo-text">This is a fork of moazbuilds/claudeclaw</span>
   </a>
   <button class="settings-btn" id="settings-btn" type="button">Settings</button>
   <aside class="settings-modal" id="settings-modal" aria-live="polite">

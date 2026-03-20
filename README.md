@@ -37,5 +37,6 @@ The setup wizard walks you through model, heartbeat, Telegram, and security, the
 - **Model Selection:** Switch models based on your workload.
 
 ## Next steps
+- Learn more about the plugin's architecture, and use of `prompts/`
 - Consider adding **file response**; see PR<a href="https://github.com/moazbuilds/claudeclaw/pull/23">23</a>
 - Find out how this relates to <a href="https://code.claude.com/docs/en/channels">channels</a> in Claude Code (currently in research preview)
