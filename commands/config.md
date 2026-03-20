@@ -14,10 +14,7 @@ Parse `$ARGUMENTS` to identify what the user wants. If no arguments are given, s
 2. Display all settings clearly:
 
    **General**
-   - Model: (e.g. `opus`, `sonnet`, `haiku`, `glm` or "default")
-   - API token: (first 5 chars + "..." or "not configured"; used when `model` is `glm`)
-   - Fallback model: (e.g. `glm`, `sonnet`, or "not configured")
-   - Fallback API token: (first 5 chars + "..." or "not configured")
+   - Model: (e.g. `opus`, `sonnet`, `haiku` or "default")
    - Timezone: (e.g. `America/New_York` or "UTC")
 
    **Heartbeat**
@@ -117,41 +114,9 @@ Disable Telegram integration.
 Set the Claude model to use for sessions.
 
 1. If model name is in `$ARGUMENTS`, use it directly.
-2. Otherwise, use **AskUserQuestion**: "Which Claude model should ClaudeClaw use?" (header: "Model", options: "opus (default)", "sonnet", "haiku", "glm")
+2. Otherwise, use **AskUserQuestion**: "Which Claude model should ClaudeClaw use?" (header: "Model", options: "opus (default)", "sonnet", "haiku")
 3. Read `.claude/claudeclaw/settings.json`.
 4. Set `model` to the new value.
-5. If the selected model is `glm`, ask for `api` token (unless already set) and save it to top-level `api`.
-6. If model is changed away from `glm`, keep `api` unchanged.
-7. Write and confirm.
-
-### `api <token>` / `api`
-
-Set or update the API token used when `model` is `glm`.
-
-1. If token is in `$ARGUMENTS`, use it directly.
-2. Otherwise, use **AskUserQuestion**: "What API token should ClaudeClaw use for glm?" (header: "API token", options: let user type via Other)
-3. Read `.claude/claudeclaw/settings.json`.
-4. Set top-level `api` to the new value.
-5. Write and confirm.
-
-### `fallback model <name>` / `fallback model`
-
-Set the fallback model used when the primary model hits a rate limit.
-
-1. If fallback model name is in `$ARGUMENTS`, use it directly.
-2. Otherwise, use **AskUserQuestion**: "Which fallback model should ClaudeClaw use?" (header: "Fallback model", options: "glm (Recommended)", "sonnet", "haiku")
-3. Read `.claude/claudeclaw/settings.json`.
-4. Set `fallback.model` to the chosen value (`""` for none).
-5. Write and confirm.
-
-### `fallback api <token>` / `fallback api`
-
-Set or clear the API token for the fallback model.
-
-1. If token is in `$ARGUMENTS`, use it directly.
-2. Otherwise, use **AskUserQuestion**: "What API token should ClaudeClaw use for fallback model?" (header: "Fallback API token", options: let user type via Other)
-3. Read `.claude/claudeclaw/settings.json`.
-4. Set `fallback.api` to the new value.
 5. Write and confirm.
 
 ### `timezone <tz>` / `timezone`
@@ -209,11 +174,6 @@ Reset all settings to defaults.
    ```json
    {
      "model": "",
-     "api": "",
-     "fallback": {
-       "model": "",
-       "api": ""
-     },
      "timezone": "UTC",
      "timezoneOffsetMinutes": 0,
      "heartbeat": {
@@ -250,11 +210,6 @@ Location: `.claude/claudeclaw/settings.json`
 ```json
 {
   "model": "opus",
-  "api": "",
-  "fallback": {
-    "model": "glm",
-    "api": ""
-  },
   "timezone": "America/New_York",
   "timezoneOffsetMinutes": -300,
   "heartbeat": {
@@ -285,10 +240,7 @@ Location: `.claude/claudeclaw/settings.json`
 
 | Key                        | Type       | Description                                    |
 |----------------------------|------------|------------------------------------------------|
-| `model`                    | string     | Claude model (`opus`, `sonnet`, `haiku`, `glm`, or full ID). Empty = default |
-| `api`                      | string     | API token used when model is `glm` (mapped to `ANTHROPIC_AUTH_TOKEN`) |
-| `fallback.model`           | string     | Backup model used automatically if primary run returns rate-limit text (recommend `glm` for provider diversity) |
-| `fallback.api`             | string     | API token used with `fallback.model` (optional) |
+| `model`                    | string     | Claude model (`opus`, `sonnet`, `haiku`, or full ID). Empty = default |
 | `timezone`                 | string     | IANA timezone name (e.g. `America/New_York`)   |
 | `timezoneOffsetMinutes`    | number     | UTC offset in minutes (auto-resolved from timezone) |
 | `heartbeat.enabled`        | boolean    | Whether the recurring heartbeat runs           |

@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
 import { getSession, createSession } from "./sessions";
-import { getSettings, type ModelConfig, type SecurityConfig } from "./config";
+import { getSettings, type SecurityConfig } from "./config";
 import { buildClockPromptPrefix } from "./timezone";
 
 const LOGS_DIR = join(process.cwd(), ".claude/claudeclaw/logs");
@@ -22,8 +22,6 @@ export interface RunResult {
   exitCode: number;
 }
 
-const RATE_LIMIT_PATTERN = /you.ve hit your limit|out of extra usage/i;
-
 // Serial queue — prevents concurrent --resume on the same session
 let queue: Promise<unknown> = Promise.resolve();
 
@@ -31,23 +29,6 @@ function enqueue<T>(fn: () => Promise<T>): Promise<T> {
   const task = queue.then(fn, fn);
   queue = task.catch(() => {});
   return task;
-}
-
-function extractRateLimitMessage(stdout: string, stderr: string): string | null {
-  const candidates = [stdout, stderr];
-  for (const text of candidates) {
-    const trimmed = text.trim();
-    if (trimmed && RATE_LIMIT_PATTERN.test(trimmed)) return trimmed;
-  }
-  return null;
-}
-
-function sameModelConfig(a: ModelConfig, b: ModelConfig): boolean {
-  return a.model.trim().toLowerCase() === b.model.trim().toLowerCase() && a.api.trim() === b.api.trim();
-}
-
-function hasModelConfig(value: ModelConfig): boolean {
-  return value.model.trim().length > 0 || value.api.trim().length > 0;
 }
 
 function isNotFoundError(error: unknown): boolean {
@@ -58,34 +39,18 @@ function isNotFoundError(error: unknown): boolean {
   return /enoent|no such file or directory/i.test(message);
 }
 
-function buildChildEnv(baseEnv: Record<string, string>, model: string, api: string): Record<string, string> {
-  const childEnv: Record<string, string> = { ...baseEnv };
-  const normalizedModel = model.trim().toLowerCase();
-
-  if (api.trim()) childEnv.ANTHROPIC_AUTH_TOKEN = api.trim();
-
-  if (normalizedModel === "glm") {
-    childEnv.ANTHROPIC_BASE_URL = "https://api.z.ai/api/anthropic";
-    childEnv.API_TIMEOUT_MS = "3000000";
-  }
-
-  return childEnv;
-}
-
 async function runClaudeOnce(
   baseArgs: string[],
   model: string,
-  api: string,
   baseEnv: Record<string, string>
 ): Promise<{ rawStdout: string; stderr: string; exitCode: number }> {
   const args = [...baseArgs];
-  const normalizedModel = model.trim().toLowerCase();
-  if (model.trim() && normalizedModel !== "glm") args.push("--model", model.trim());
+  if (model.trim()) args.push("--model", model.trim());
 
   const proc = Bun.spawn(args, {
     stdout: "pipe",
     stderr: "pipe",
-    env: buildChildEnv(baseEnv, model, api),
+    env: { ...baseEnv },
   });
 
   const [rawStdout, stderr] = await Promise.all([
@@ -231,12 +196,7 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const logFile = join(LOGS_DIR, `${name}-${timestamp}.log`);
 
-  const { security, model, api, fallback } = getSettings();
-  const primaryConfig: ModelConfig = { model, api };
-  const fallbackConfig: ModelConfig = {
-    model: fallback?.model ?? "",
-    api: fallback?.api ?? "",
-  };
+  const { security, model } = getSettings();
   const securityArgs = buildSecurityArgs(security);
 
   console.log(
@@ -280,31 +240,16 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
   const { CLAUDECODE: _, ...cleanEnv } = process.env;
   const baseEnv = { ...cleanEnv } as Record<string, string>;
 
-  let exec = await runClaudeOnce(args, primaryConfig.model, primaryConfig.api, baseEnv);
-  const primaryRateLimit = extractRateLimitMessage(exec.rawStdout, exec.stderr);
-  let usedFallback = false;
-
-  if (primaryRateLimit && hasModelConfig(fallbackConfig) && !sameModelConfig(primaryConfig, fallbackConfig)) {
-    console.warn(
-      `[${new Date().toLocaleTimeString()}] Claude limit reached; retrying with fallback${fallbackConfig.model ? ` (${fallbackConfig.model})` : ""}...`
-    );
-    exec = await runClaudeOnce(args, fallbackConfig.model, fallbackConfig.api, baseEnv);
-    usedFallback = true;
-  }
+  const exec = await runClaudeOnce(args, model, baseEnv);
 
   const rawStdout = exec.rawStdout;
   const stderr = exec.stderr;
   const exitCode = exec.exitCode;
   let stdout = rawStdout;
   let sessionId = existing?.sessionId ?? "unknown";
-  const rateLimitMessage = extractRateLimitMessage(rawStdout, stderr);
-
-  if (rateLimitMessage) {
-    stdout = rateLimitMessage;
-  }
 
   // For new sessions, parse the JSON to extract session_id and result text
-  if (!rateLimitMessage && isNew && exitCode === 0) {
+  if (isNew && exitCode === 0) {
     try {
       const json = JSON.parse(rawStdout);
       sessionId = json.session_id;
@@ -327,7 +272,6 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
     `# ${name}`,
     `Date: ${new Date().toISOString()}`,
     `Session: ${sessionId} (${isNew ? "new" : "resumed"})`,
-    `Model config: ${usedFallback ? "fallback" : "primary"}`,
     `Prompt: ${prompt}`,
     `Exit code: ${result.exitCode}`,
     "",
