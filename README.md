@@ -34,6 +34,7 @@ The setup wizard walks you through model, heartbeat, Telegram, and security, the
 Change directory into the assistant's workspace and then
 
 ```bash
+claude plugin marketplace update claudeclaw
 claude plugin update claudeclaw@claudeclaw --scope local
 ```
 
