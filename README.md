@@ -1,10 +1,11 @@
-This is my public fork of [moazbuilds/claudeclaw]("https://github.com/moazbuilds/claudeclaw/"), a lightweight, open-source OpenClaw variant built into Claude Code. It turns your Claude Code into a personal assistant that never sleeps. It runs as a background daemon, executing tasks on a schedule, responding to messages on Telegram, and integrating with any service you need.
+This is my public fork of <a href="https://github.com/moazbuilds/claudeclaw/">moazbuilds/claudeclaw</a>, a lightweight, open-source OpenClaw variant built into Claude Code. It turns your Claude Code into a personal assistant that never sleeps. It runs as a background daemon, executing tasks on a schedule, responding to messages on Telegram, and integrating with any service you need.
 
 ## How does this vary from upstream?
 
 I started this fork to submit a pull request against upstream when I realized that some other PRs are also awaiting integration that I didn't want to wait for.  I also plan to adjust the project more to my specific needs and learn along the way. Current differences:
 - **Telegram only**
-- **Removes whisper for audio transciption** (should be handled via skills or MCP)
+- **No fallback model**, resort to *extra usage* for paid Claude plans instead
+- **No audio transciption** (should be handled via skills or MCP)
 - **File attachment support**
 - **Reporting Claude errors**
 
@@ -27,14 +28,13 @@ The setup wizard walks you through model, heartbeat, Telegram, and security, the
 - **Cron Jobs:** Timezone-aware schedules for repeating or one-time tasks with reliable execution.
 
 ### Communication
-- **Telegram:** Text, image, and file support.
+- **Telegram:** Text, image, and file attachment support.
 - **Time Awareness:** Message time prefixes help the agent understand delays and daily patterns.
 
 ### Reliability and Control
-- **GLM Fallback:** Automatically continue with GLM models if your primary limit is reached.
 - **Web Dashboard:** Manage jobs, monitor runs, and inspect logs in real time.
 - **Security Levels:** Four access levels from read-only to full system access.
 - **Model Selection:** Switch models based on your workload.
 
 ## Next steps
-- **Remove GLM Fallback:** When Claude is no longer available due to session or weekly limits, upstream falls back to using GLM. I will drop this in favour of *extra usage* for paid Claude plans. Keeps things simpler (i.e., sticks to using only Claude Code), and doesn't change the model/performance without the user's consent. Using other models for specific tasks should be handled via skills or MCP.
+- Find out how this relates to <a href="https://code.claude.com/docs/en/channels">channels</a> in Claude Code (currently in research preview)
