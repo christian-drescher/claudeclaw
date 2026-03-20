@@ -53,6 +53,8 @@ claude plugin update claudeclaw@claudeclaw --scope local
 - **Model Selection:** Switch models based on your workload.
 
 ## Next steps
+- Consider excluding CLAUDE.md from loading as `<system-reminder>` block in first user massage by adding to <a href="https://code.claude.com/docs/en/memory#exclude-specific-claude-md-files">claudeMdExcludes</a> and instead use `--append-system-prompt-file <path>` to elevate it to part of the system prompt (as the plugin does already), or make it the system prompt.
+- Move Auto-Memory into `workspace/`; set <a href="https://code.claude.com/docs/en/memory#storage-location">autoMemoryDirectory</a> locally
 - Learn more about the plugin's architecture, and use of `prompts/`
 - Consider adding **file response**; see PR<a href="https://github.com/moazbuilds/claudeclaw/pull/23">23</a>
 - Find out how this relates to <a href="https://code.claude.com/docs/en/channels">channels</a> in Claude Code (currently in research preview)

@@ -272,6 +272,7 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
     `# ${name}`,
     `Date: ${new Date().toISOString()}`,
     `Session: ${sessionId} (${isNew ? "new" : "resumed"})`,
+    `Args: ${args.join(" ")}`,
     `Prompt: ${prompt}`,
     `Exit code: ${result.exitCode}`,
     "",
