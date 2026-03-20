@@ -100,10 +100,7 @@ Start the heartbeat daemon for this project. Follow these steps exactly:
    Use the description "Starting ClaudeClaw server" for this command.
    Wait 1 second, then check `cat .claude/claudeclaw/logs/daemon.log`. If it contains "Aborted: daemon already running", tell the user and exit.
    - Read `.claude/claudeclaw/settings.json` for `web.port` (default `4632` if missing) and `web.host` (default `127.0.0.1`).
-   - Then try to open the dashboard directly:
-     - Linux: `xdg-open http://<HOST>:<PORT>`
-     - macOS: `open http://<HOST>:<PORT>`
-     - If open command fails, print the URL clearly so user can open it manually.
+   - Then print the URL clearly so user can open it manually.
 
 7. **Capture session ID**: Read `.claude/claudeclaw/session.json` and extract the `sessionId` field. This is the shared Claude session used by the daemon for heartbeat, jobs, and Telegram.
 
