@@ -1,7 +1,6 @@
 import { ensureProjectClaudeMd, run, runUserMessage } from "../runner";
 import { getSettings, loadSettings } from "../config";
 import { resetSession } from "../sessions";
-import { transcribeAudioToText } from "../whisper";
 import { resolveSkillPrompt } from "../skills";
 import { mkdir } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -388,7 +387,6 @@ async function handleMessageCreate(token: string, message: DiscordMessage): Prom
 
     let imagePath: string | null = null;
     let voicePath: string | null = null;
-    let voiceTranscript: string | null = null;
 
     if (hasImage) {
       try {
@@ -406,15 +404,7 @@ async function handleMessageCreate(token: string, message: DiscordMessage): Prom
       }
 
       if (voicePath) {
-        try {
-          debugLog(`Voice file saved: path=${voicePath}`);
-          voiceTranscript = await transcribeAudioToText(voicePath, {
-            debug: discordDebug,
-            log: (msg) => debugLog(msg),
-          });
-        } catch (err) {
-          console.error(`[Discord] Failed to transcribe voice for ${label}: ${err instanceof Error ? err.message : err}`);
-        }
+        debugLog(`Voice file saved: path=${voicePath}`);
       }
     }
 
@@ -448,12 +438,12 @@ async function handleMessageCreate(token: string, message: DiscordMessage): Prom
     } else if (hasImage) {
       promptParts.push("The user attached an image, but downloading it failed. Respond and ask them to resend.");
     }
-    if (voiceTranscript) {
-      promptParts.push(`Voice transcript: ${voiceTranscript}`);
-      promptParts.push("The user attached voice audio. Use the transcript as their spoken message.");
+    if (voicePath) {
+      promptParts.push(`Voice file path: ${voicePath}`);
+      promptParts.push("The user sent a voice message. Find a way to transcribe it and use the transcript as their spoken message.");
     } else if (hasVoice) {
       promptParts.push(
-        "The user attached voice audio, but it could not be transcribed. Respond and ask them to resend a clearer clip.",
+        "The user attached voice audio, but downloading it failed. Respond and ask them to resend.",
       );
     }
 

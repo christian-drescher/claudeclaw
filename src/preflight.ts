@@ -16,7 +16,7 @@ import {
 } from "fs";
 import { join, dirname } from "path";
 import { homedir, tmpdir } from "os";
-import { fileURLToPath } from "url";
+
 
 // ── Plugin repos to install (one plugin per repo) ───────────────────
 const PLUGINS = [
@@ -45,7 +45,6 @@ const OFFICIAL_REPO = "https://github.com/anthropics/claude-plugins-official";
 const PLUGINS_DIR = join(homedir(), ".claude", "plugins");
 const INST_FILE = join(PLUGINS_DIR, "installed_plugins.json");
 const MKTP_FILE = join(PLUGINS_DIR, "known_marketplaces.json");
-const WHISPER_WARMUP_SCRIPT = fileURLToPath(new URL("./whisper-warmup.ts", import.meta.url));
 
 interface PluginEntry {
   scope: string;
@@ -145,19 +144,7 @@ function installDepsIfPresent(dir: string, pkgMgr: string, label: string): void 
   run(`${pkgMgr} install`, { cwd: dir, stdio: "inherit" });
 }
 
-function startWhisperWarmupInBackground(): void {
-  try {
-    const proc = Bun.spawn([process.execPath, "run", WHISPER_WARMUP_SCRIPT], {
-      stdin: "ignore",
-      stdout: "inherit",
-      stderr: "inherit",
-    });
-    proc.unref();
-    console.log("preflight: whisper warmup started in background");
-  } catch (err) {
-    console.error(`preflight: failed to start whisper warmup - ${err instanceof Error ? err.message : String(err)}`);
-  }
-}
+
 
 // ── Install a single-repo plugin ────────────────────────────────────
 
@@ -414,7 +401,6 @@ export function preflight(projectPath: string): void {
 
   mkdirSync(join(PLUGINS_DIR, "marketplaces"), { recursive: true });
   mkdirSync(join(PLUGINS_DIR, "cache"), { recursive: true });
-  startWhisperWarmupInBackground();
 
   let installed = 0;
   let skipped = 0;

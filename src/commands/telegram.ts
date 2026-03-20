@@ -600,7 +600,7 @@ async function handleMessage(message: TelegramMessage): Promise<void> {
     }
     if (voicePath) {
       promptParts.push(`Voice file path: ${voicePath}`);
-      promptParts.push("The user sent a voice message. Transcribe it using an available transcription tool, then respond to the transcribed text as their spoken message.");
+      promptParts.push("The user sent a voice message. Find a way to transcribe it and use the transcript as their spoken message.");
     } else if (hasVoice) {
       promptParts.push(
         "The user attached voice audio, but downloading it failed. Respond and ask them to resend."
