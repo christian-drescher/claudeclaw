@@ -8,7 +8,6 @@ export interface StateData {
   jobs: { name: string; nextAt: number }[];
   security: string;
   telegram: boolean;
-  discord: boolean;
   startedAt: number;
   web?: { enabled: boolean; host: string; port: number };
 }
