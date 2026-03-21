@@ -11,8 +11,8 @@ const PROMPTS_DIR = join(import.meta.dir, "..", "prompts");
 const HEARTBEAT_PROMPT_FILE = join(PROMPTS_DIR, "heartbeat", "HEARTBEAT.md");
 // Project-level prompt overrides live here (gitignored, user-owned)
 const PROJECT_PROMPTS_DIR = join(process.cwd(), ".claude", "claudeclaw", "prompts");
-const PROJECT_CLAUDE_MD = join(process.cwd(), "CLAUDE.md");
-const LEGACY_PROJECT_CLAUDE_MD = join(process.cwd(), ".claude", "CLAUDE.md");
+const IDENTITY_MD = join(process.cwd(), "IDENTITY.md");
+const LEGACY_IDENTITY_MD = join(process.cwd(), ".claude", "IDENTITY.md");
 const CLAUDECLAW_BLOCK_START = "<!-- claudeclaw:managed:start -->";
 const CLAUDECLAW_BLOCK_END = "<!-- claudeclaw:managed:end -->";
 
@@ -76,8 +76,8 @@ const DIR_SCOPE_PROMPT = [
 ].join("\n");
 
 export async function ensureProjectClaudeMd(): Promise<void> {
-  // Preflight-only initialization: never rewrite an existing project CLAUDE.md.
-  if (existsSync(PROJECT_CLAUDE_MD)) return;
+  // Preflight-only initialization: never rewrite an existing project IDENTITY.md.
+  if (existsSync(IDENTITY_MD)) return;
 
   const promptContent = (await loadPrompts()).trim();
   const managedBlock = [
@@ -88,12 +88,12 @@ export async function ensureProjectClaudeMd(): Promise<void> {
 
   let content = "";
 
-  if (existsSync(LEGACY_PROJECT_CLAUDE_MD)) {
+  if (existsSync(LEGACY_IDENTITY_MD)) {
     try {
-      const legacy = await readFile(LEGACY_PROJECT_CLAUDE_MD, "utf8");
+      const legacy = await readFile(LEGACY_IDENTITY_MD, "utf8");
       content = legacy.trim();
     } catch (e) {
-      console.error(`[${new Date().toLocaleTimeString()}] Failed to read legacy .claude/CLAUDE.md:`, e);
+      console.error(`[${new Date().toLocaleTimeString()}] Failed to read legacy .claude/IDENTITY.md:`, e);
       return;
     }
   }
@@ -113,9 +113,9 @@ export async function ensureProjectClaudeMd(): Promise<void> {
       : `${managedBlock}\n`;
 
   try {
-    await writeFile(PROJECT_CLAUDE_MD, merged, "utf8");
+    await writeFile(IDENTITY_MD, merged, "utf8");
   } catch (e) {
-    console.error(`[${new Date().toLocaleTimeString()}] Failed to write project CLAUDE.md:`, e);
+    console.error(`[${new Date().toLocaleTimeString()}] Failed to write project IDENTITY.md:`, e);
   }
 }
 
@@ -215,20 +215,22 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
   // Build the appended system prompt: prompt files + directory scoping
   // This is passed on EVERY invocation (not just new sessions) because
   // --append-system-prompt does not persist across --resume.
-  const promptContent = await loadPrompts();
+  
   const appendParts: string[] = [
-    "You are running inside ClaudeClaw.",
+    // "You are running inside ClaudeClaw.",
   ];
-  if (promptContent) appendParts.push(promptContent);
 
-  // Load the project's CLAUDE.md if it exists
-  if (existsSync(PROJECT_CLAUDE_MD)) {
+  // Load the project's IDENTITY.md if it exists
+  if (existsSync(IDENTITY_MD)) {
     try {
-      const claudeMd = await Bun.file(PROJECT_CLAUDE_MD).text();
+      const claudeMd = await Bun.file(IDENTITY_MD).text();
       if (claudeMd.trim()) appendParts.push(claudeMd.trim());
     } catch (e) {
-      console.error(`[${new Date().toLocaleTimeString()}] Failed to read project CLAUDE.md:`, e);
+      console.error(`[${new Date().toLocaleTimeString()}] Failed to read project IDENTITY.md:`, e);
     }
+  } else {
+    const promptContent = await loadPrompts();
+    if (promptContent) appendParts.push(promptContent);
   }
 
   if (security.level !== "unrestricted") appendParts.push(DIR_SCOPE_PROMPT);

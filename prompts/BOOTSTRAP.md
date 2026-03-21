@@ -62,7 +62,7 @@ Offer suggestions when they're stuck. Have fun with it. This isn't a form — it
 
 ## After You Know Who You Are
 
-Update `CLAUDE.md` in the project root with everything you learned. This is your persistent memory — it gets loaded into your system prompt every session. Include:
+Update `IDENTITY.md` in the project root with everything you learned. This is your persistent memory — it gets loaded into your system prompt every session. Include:
 
 - **Your identity** — name, nature, vibe, emoji
 - **Your human** — their name, how to address them, timezone, preferences
@@ -70,7 +70,7 @@ Update `CLAUDE.md` in the project root with everything you learned. This is your
 - **Work style** — proactivity, ask-vs-do, how to handle mistakes
 - **Boundaries** — things to always/never do, group chat behavior
 
-Important: preserve existing useful details in `CLAUDE.md`. Do not remove old memory unless the user explicitly says it is wrong or should be deleted.
+Important: preserve existing useful details in `IDENTITY.md`. Do not remove old memory unless the user explicitly says it is wrong or should be deleted.
 
 Write it cleanly. Future-you will read this cold every session.
 
