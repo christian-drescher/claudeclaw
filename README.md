@@ -3,6 +3,7 @@ This is my public fork of <a href="https://github.com/moazbuilds/claudeclaw/">mo
 ## How does this vary from upstream?
 
 I started this fork to submit a pull request against upstream when I realized that some other PRs are also awaiting integration that I didn't want to wait for.  I also plan to adjust the project more to my specific needs and learn along the way. Current differences:
+- **IDENTITY.md** in the agent's project directory is elevated to system prompt level at every invocation; not using `CLAUDE.md` for persisting assistant's identity
 - **Telegram only**
 - **No fallback model**, resort to *extra usage* for paid Claude plans instead
 - **No audio transciption** (should be handled via skills or MCP)
@@ -54,7 +55,6 @@ claude plugin update claudeclaw@claudeclaw --scope local
 - **Model Selection:** Switch models based on your workload.
 
 ## Next steps
-- Consider excluding CLAUDE.md from loading as `<system-reminder>` block in first user massage by adding to <a href="https://code.claude.com/docs/en/memory#exclude-specific-claude-md-files">claudeMdExcludes</a> and instead use `--append-system-prompt-file <path>` to elevate it to part of the system prompt (as the plugin does already), or make it the system prompt.
 - Move Auto-Memory into `workspace/`; set <a href="https://code.claude.com/docs/en/memory#storage-location">autoMemoryDirectory</a> locally
 - Learn more about the plugin's architecture, and use of `prompts/`
 - Consider adding **file response**; see PR<a href="https://github.com/moazbuilds/claudeclaw/pull/23">23</a>
