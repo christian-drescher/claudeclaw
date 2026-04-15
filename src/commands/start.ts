@@ -402,10 +402,6 @@ export async function start(args: string[] = []) {
                 changed = true;
               }
             }
-          if (typeof patch.prompt === "string" && currentSettings.heartbeat.prompt !== patch.prompt) {
-            currentSettings.heartbeat.prompt = patch.prompt;
-            changed = true;
-          }
           if (Array.isArray(patch.excludeWindows)) {
             const prev = JSON.stringify(currentSettings.heartbeat.excludeWindows);
             const next = JSON.stringify(patch.excludeWindows);
@@ -500,20 +496,11 @@ export async function start(args: string[] = []) {
         );
         return;
       }
-      Promise.all([
-        resolvePrompt(currentSettings.heartbeat.prompt),
-        loadHeartbeatPromptTemplate(),
-      ])
-        .then(([prompt, template]) => {
-          const userPromptSection = prompt.trim()
-            ? `User custom heartbeat prompt:\n${prompt.trim()}`
-            : "";
-          const mergedPrompt = [template.trim(), userPromptSection]
-            .filter((part) => part.length > 0)
-            .join("\n\n");
-          if (!mergedPrompt) return null;
+      loadHeartbeatPromptTemplate()
+        .then((template) => {
+          if (!template.trim()) return null;
           const clock = buildClockPromptPrefix(new Date(), currentSettings.timezoneOffsetMinutes);
-          return run("heartbeat", `${clock}\n${mergedPrompt}`);
+          return run("heartbeat", `${clock}\n${template.trim()}`);
         })
         .then((r) => {
           if (!r) return;
@@ -540,7 +527,7 @@ export async function start(args: string[] = []) {
   // - trigger mode: run exactly one trigger prompt (no separate bootstrap)
   // - normal mode: bootstrap to initialize session context
   if (hasTriggerFlag) {
-    const triggerPrompt = hasPromptFlag ? payload : "Wake up, my friend!";
+    const triggerPrompt = hasPromptFlag ? payload : "Wake up! New session start.";
     const triggerResult = await run("trigger", triggerPrompt);
     console.log(triggerResult.stdout);
     if (telegramFlag) forwardToTelegram("", triggerResult);
@@ -568,7 +555,6 @@ export async function start(args: string[] = []) {
       const hbChanged =
         newSettings.heartbeat.enabled !== currentSettings.heartbeat.enabled ||
         newSettings.heartbeat.interval !== currentSettings.heartbeat.interval ||
-        newSettings.heartbeat.prompt !== currentSettings.heartbeat.prompt ||
         newSettings.timezoneOffsetMinutes !== currentSettings.timezoneOffsetMinutes ||
         newSettings.timezone !== currentSettings.timezone ||
         JSON.stringify(newSettings.heartbeat.excludeWindows) !== JSON.stringify(currentSettings.heartbeat.excludeWindows);

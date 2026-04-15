@@ -23,7 +23,6 @@ export interface StartWebUiOptions {
   onHeartbeatSettingsChanged?: (patch: {
     enabled?: boolean;
     interval?: number;
-    prompt?: string;
     excludeWindows?: Array<{ days?: number[]; start: string; end: string }>;
   }) => void | Promise<void>;
   onJobsChanged?: () => void | Promise<void>;

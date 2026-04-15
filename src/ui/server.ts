@@ -37,13 +37,11 @@ export function startWebUi(opts: StartWebUiOptions): WebServerHandle {
           const payload = body as {
             enabled?: unknown;
             interval?: unknown;
-            prompt?: unknown;
             excludeWindows?: unknown;
           };
           const patch: {
             enabled?: boolean;
             interval?: number;
-            prompt?: string;
             excludeWindows?: Array<{ days?: number[]; start: string; end: string }>;
           } = {};
 
@@ -53,7 +51,6 @@ export function startWebUi(opts: StartWebUiOptions): WebServerHandle {
             if (!Number.isFinite(iv)) throw new Error("interval must be numeric");
             patch.interval = iv;
           }
-          if ("prompt" in payload) patch.prompt = String(payload.prompt ?? "");
           if ("excludeWindows" in payload) {
             if (!Array.isArray(payload.excludeWindows)) {
               throw new Error("excludeWindows must be an array");
@@ -80,7 +77,6 @@ export function startWebUi(opts: StartWebUiOptions): WebServerHandle {
           if (
             !("enabled" in patch) &&
             !("interval" in patch) &&
-            !("prompt" in patch) &&
             !("excludeWindows" in patch)
           ) {
             throw new Error("no heartbeat fields provided");

@@ -13,7 +13,6 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
     const hbModalClose = $("hb-modal-close");
     const hbForm = $("hb-form");
     const hbIntervalInput = $("hb-interval-input");
-    const hbPromptInput = $("hb-prompt-input");
     const hbModalStatus = $("hb-modal-status");
     const hbCancelBtn = $("hb-cancel-btn");
     const hbSaveBtn = $("hb-save-btn");
@@ -492,9 +491,8 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
         const data = await res.json();
         const on = Boolean(data?.heartbeat?.enabled);
         const intervalMinutes = Number(data?.heartbeat?.interval) || 15;
-        const prompt = typeof data?.heartbeat?.prompt === "string" ? data.heartbeat.prompt : "";
         heartbeatTimezoneOffsetMinutes = clampTimezoneOffsetMinutes(data?.timezoneOffsetMinutes);
-        setHeartbeatUi(on, undefined, intervalMinutes, prompt);
+        setHeartbeatUi(on, undefined, intervalMinutes);
         renderClock();
         rerenderJobsList();
         updateQuickJobUi();
@@ -535,13 +533,12 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
       ).join("");
     }
 
-    function setHeartbeatUi(on, label, intervalMinutes, prompt) {
+    function setHeartbeatUi(on, label, intervalMinutes) {
       if (!hbToggle) return;
       hbToggle.textContent = label || (on ? "Enabled" : "Disabled");
       hbToggle.className = "hb-toggle " + (on ? "on" : "off");
       hbToggle.dataset.enabled = on ? "1" : "0";
       if (intervalMinutes != null) hbToggle.dataset.interval = String(intervalMinutes);
-      if (prompt != null) hbToggle.dataset.prompt = String(prompt);
       const iv = Number(hbToggle.dataset.interval) || 15;
       if (hbInfoEl) hbInfoEl.textContent = on ? ("every " + iv + " minutes") : ("paused (interval " + iv + "m)");
     }
@@ -563,7 +560,7 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
     }
 
     async function openHeartbeatConfig() {
-      if (!hbIntervalInput || !hbPromptInput || !hbModalStatus) return;
+      if (!hbIntervalInput || !hbModalStatus) return;
       openHeartbeatModal();
       hbModalStatus.textContent = "Loading...";
       try {
@@ -572,7 +569,6 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
         if (!out.ok) throw new Error(out.error || "failed to load heartbeat");
         const hb = out.heartbeat || {};
         hbIntervalInput.value = String(Number(hb.interval) || Number(hbToggle?.dataset.interval) || 15);
-        hbPromptInput.value = typeof hb.prompt === "string" ? hb.prompt : (hbToggle?.dataset.prompt || "");
         hbModalStatus.textContent = "";
       } catch (err) {
         hbModalStatus.textContent = "Failed: " + String(err instanceof Error ? err.message : err);
@@ -649,11 +645,10 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
         if (hbBusy) return;
         const current = hbToggle.dataset.enabled === "1";
         const intervalMinutes = Number(hbToggle.dataset.interval) || 15;
-        const currentPrompt = hbToggle.dataset.prompt || "";
         const next = !current;
         hbBusy = true;
         hbToggle.disabled = true;
-        setHeartbeatUi(next, next ? "Enabled" : "Disabled", intervalMinutes, currentPrompt);
+        setHeartbeatUi(next, next ? "Enabled" : "Disabled", intervalMinutes);
         try {
           const res = await fetch("/api/settings/heartbeat", {
             method: "POST",
@@ -663,11 +658,11 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
           const out = await res.json();
           if (!out.ok) throw new Error(out.error || "save failed");
           if (out.heartbeat) {
-            setHeartbeatUi(Boolean(out.heartbeat.enabled), undefined, Number(out.heartbeat.interval) || intervalMinutes, typeof out.heartbeat.prompt === "string" ? out.heartbeat.prompt : currentPrompt);
+            setHeartbeatUi(Boolean(out.heartbeat.enabled), undefined, Number(out.heartbeat.interval) || intervalMinutes);
           }
           await refreshState();
         } catch {
-          setHeartbeatUi(current, current ? "Enabled" : "Disabled", intervalMinutes, currentPrompt);
+          setHeartbeatUi(current, current ? "Enabled" : "Disabled", intervalMinutes);
         } finally {
           hbBusy = false;
           hbToggle.disabled = false;
@@ -675,19 +670,14 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
       });
     }
 
-    if (hbForm && hbIntervalInput && hbPromptInput && hbModalStatus && hbSaveBtn && hbCancelBtn) {
+    if (hbForm && hbIntervalInput && hbModalStatus && hbSaveBtn && hbCancelBtn) {
       hbForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         if (hbSaveBusy) return;
 
         const interval = Number(String(hbIntervalInput.value || "").trim());
-        const prompt = String(hbPromptInput.value || "").trim();
         if (!Number.isFinite(interval) || interval < 1 || interval > 1440) {
           hbModalStatus.textContent = "Interval must be 1-1440 minutes.";
-          return;
-        }
-        if (!prompt) {
-          hbModalStatus.textContent = "Prompt is required.";
           return;
         }
 
@@ -701,7 +691,6 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               interval,
-              prompt,
             }),
           });
           const out = await res.json();
@@ -711,8 +700,7 @@ export const pageScript = String.raw`    const $ = (id) => document.getElementBy
           setHeartbeatUi(
             "enabled" in next ? Boolean(next.enabled) : enabled,
             undefined,
-            Number(next.interval) || interval,
-            typeof next.prompt === "string" ? next.prompt : prompt
+            Number(next.interval) || interval
           );
           hbModalStatus.textContent = "Saved.";
           await refreshState();

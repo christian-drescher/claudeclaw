@@ -20,7 +20,6 @@ Parse `$ARGUMENTS` to identify what the user wants. If no arguments are given, s
    **Heartbeat**
    - Enabled: yes/no
    - Interval: Xm
-   - Prompt: (show full prompt or "not set")
    - Exclude windows: (list each window's days + start-end, or "none")
    - Forward to Telegram: yes/no (`HEARTBEAT_OK` is forwarded only when enabled)
 
@@ -58,16 +57,6 @@ Change the heartbeat interval.
 3. Set `heartbeat.interval` to the new value.
 4. Write the updated settings back.
 5. Confirm the change. The daemon will pick up the new interval within 30 seconds.
-
-### `heartbeat prompt` / `prompt`
-
-Change the heartbeat prompt.
-
-1. Read `.claude/claudeclaw/settings.json` and show the current prompt.
-2. Use **AskUserQuestion**: "What prompt should the heartbeat run?" (header: "Prompt", options: suggest 2-3 prompts relevant to the project, plus the current prompt if set as an option)
-3. Set `heartbeat.prompt` to the new value.
-4. Write the updated settings back.
-5. Confirm the change.
 
 ### `heartbeat telegram on` / `heartbeat telegram off` / `heartbeat forward telegram on` / `heartbeat forward telegram off`
 
@@ -131,7 +120,7 @@ Set the IANA timezone (e.g. `America/New_York`, `Europe/London`, `UTC`).
 
 ### `security level <level>` / `security`
 
-Set the security level for Claude sessions.
+Set the security level for sessions.
 
 1. If level is in `$ARGUMENTS`, validate it is one of: `locked`, `strict`, `moderate`, `unrestricted`.
 2. Otherwise, use **AskUserQuestion**: "What security level should sessions use?" (header: "Security", options: "locked — Read/Grep/Glob only", "strict — No Bash/WebSearch/WebFetch", "moderate — All tools, project-scoped (Recommended)", "unrestricted — All tools, no restrictions")
@@ -179,7 +168,6 @@ Reset all settings to defaults.
      "heartbeat": {
        "enabled": false,
        "interval": 15,
-       "prompt": "",
        "excludeWindows": [],
        "forwardToTelegram": true
      },
@@ -215,7 +203,6 @@ Location: `.claude/claudeclaw/settings.json`
   "heartbeat": {
     "enabled": true,
     "interval": 15,
-    "prompt": "Remind me to drink water and stretch.",
     "excludeWindows": [
       { "days": [0, 6], "start": "23:00", "end": "07:00" }
     ],
@@ -245,7 +232,6 @@ Location: `.claude/claudeclaw/settings.json`
 | `timezoneOffsetMinutes`    | number     | UTC offset in minutes (auto-resolved from timezone) |
 | `heartbeat.enabled`        | boolean    | Whether the recurring heartbeat runs           |
 | `heartbeat.interval`       | number     | Minutes between heartbeat executions           |
-| `heartbeat.prompt`         | string     | Prompt sent to Claude on each heartbeat        |
 | `heartbeat.excludeWindows` | object[]   | Quiet windows where heartbeat is skipped       |
 | `heartbeat.excludeWindows[].days` | number[] | Days of week (0=Sun..6=Sat); omit for all days |
 | `heartbeat.excludeWindows[].start` | string | Window start time in `HH:MM` 24h format       |

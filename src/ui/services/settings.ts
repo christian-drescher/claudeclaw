@@ -8,14 +8,12 @@ export async function setHeartbeatEnabled(enabled: boolean): Promise<void> {
 export interface HeartbeatSettingsPatch {
   enabled?: boolean;
   interval?: number;
-  prompt?: string;
   excludeWindows?: Array<{ days?: number[]; start: string; end: string }>;
 }
 
 export interface HeartbeatSettingsData {
   enabled: boolean;
   interval: number;
-  prompt: string;
   excludeWindows: Array<{ days?: number[]; start: string; end: string }>;
 }
 
@@ -26,7 +24,6 @@ export async function readHeartbeatSettings(): Promise<HeartbeatSettingsData> {
   return {
     enabled: Boolean(data.heartbeat.enabled),
     interval: Number(data.heartbeat.interval) || 15,
-    prompt: typeof data.heartbeat.prompt === "string" ? data.heartbeat.prompt : "",
     excludeWindows: Array.isArray(data.heartbeat.excludeWindows) ? data.heartbeat.excludeWindows : [],
   };
 }
@@ -42,9 +39,6 @@ export async function updateHeartbeatSettings(patch: HeartbeatSettingsPatch): Pr
   if (typeof patch.interval === "number" && Number.isFinite(patch.interval)) {
     const clamped = Math.max(1, Math.min(1440, Math.round(patch.interval)));
     data.heartbeat.interval = clamped;
-  }
-  if (typeof patch.prompt === "string") {
-    data.heartbeat.prompt = patch.prompt;
   }
   if (Array.isArray(patch.excludeWindows)) {
     data.heartbeat.excludeWindows = patch.excludeWindows;

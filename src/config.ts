@@ -15,7 +15,6 @@ const DEFAULT_SETTINGS: Settings = {
   heartbeat: {
     enabled: false,
     interval: 15,
-    prompt: "",
     excludeWindows: [],
     forwardToTelegram: true,
   },
@@ -33,7 +32,6 @@ export interface HeartbeatExcludeWindow {
 export interface HeartbeatConfig {
   enabled: boolean;
   interval: number;
-  prompt: string;
   excludeWindows: HeartbeatExcludeWindow[];
   forwardToTelegram: boolean;
 }
@@ -106,7 +104,6 @@ function parseSettings(raw: Record<string, any>): Settings {
     heartbeat: {
       enabled: raw.heartbeat?.enabled ?? false,
       interval: raw.heartbeat?.interval ?? 15,
-      prompt: raw.heartbeat?.prompt ?? "",
       excludeWindows: parseExcludeWindows(raw.heartbeat?.excludeWindows),
       forwardToTelegram: raw.heartbeat?.forwardToTelegram ?? false,
     },

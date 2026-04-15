@@ -34,7 +34,7 @@ Start the heartbeat daemon for this project. Follow these steps exactly:
      - Ask them to install Node.js LTS and rerun start, then exit.
 
 3. **Check existing config**: Read `.claude/claudeclaw/settings.json` (if it exists). Determine which sections are already configured:
-   - **Heartbeat configured** = `heartbeat.enabled` is `true` AND `heartbeat.prompt` is non-empty
+   - **Heartbeat configured** = `heartbeat.enabled` is `true`
    - **Telegram configured** = `telegram.token` is non-empty
    - **Security configured** = `security.level` exists and is not `"moderate"` (the default), OR `security.allowedTools`/`security.disallowedTools` are non-empty
 
@@ -59,7 +59,7 @@ Start the heartbeat daemon for this project. Follow these steps exactly:
    - **Model** (always ask if `model` is empty/unset): "Which Claude model should ClaudeClaw use?" (header: "Model", options: "opus (default)", "sonnet", "haiku")
    - **If heartbeat is NOT configured**: "Enable heartbeat? Example: I can remind you to drink water every 30 minutes, or you can fully customize what runs." (header: "Heartbeat", options: "Yes" / "No")
    - **If Telegram is NOT configured**: "Configure Telegram? Recommended if you want it 24/7 live." (header: "Telegram", options: "Yes" / "No")
-   - **If security is NOT configured**: "What security level for Claude?" (header: "Security", options:
+   - **If security is NOT configured**: "What security level for the agent?" (header: "Security", options:
      - "Moderate (Recommended)" (description: "Full access scoped to project directory")
      - "Locked" (description: "Read-only — can only search and read files, no edits, bash, or web")
      - "Strict" (description: "Can edit files but no bash or web access")
@@ -79,7 +79,7 @@ Start the heartbeat daemon for this project. Follow these steps exactly:
      - Telegram bot token (hint: create/get it from `@BotFather`)
      - Allowed Telegram user IDs (hint: use `@userinfobot` to get your numeric ID)
      - Set `telegram.token` and `telegram.allowedUserIds` (as array of numbers) accordingly.
-     - Note: Telegram bot runs in-process with the daemon. All components (heartbeat, cron, telegram) share one Claude session.
+     - Note: Telegram bot runs in-process with the daemon. All components (heartbeat, cron, telegram) share one session.
 
    - **Security level mapping** — set `security.level` in settings based on their choice:
      - "Locked" → `"locked"`
@@ -102,7 +102,7 @@ Start the heartbeat daemon for this project. Follow these steps exactly:
    - Read `.claude/claudeclaw/settings.json` for `web.port` (default `4632` if missing) and `web.host` (default `127.0.0.1`).
    - Then print the URL clearly so user can open it manually.
 
-7. **Capture session ID**: Read `.claude/claudeclaw/session.json` and extract the `sessionId` field. This is the shared Claude session used by the daemon for heartbeat, jobs, and Telegram.
+7. **Capture session ID**: Read `.claude/claudeclaw/session.json` and extract the `sessionId` field. This is the shared session used by the daemon for heartbeat, jobs, and Telegram.
 
 8. **Report**: Print the ASCII art below then show the PID, session, status info, Telegram bot next step, and the Web UI URL.
 
@@ -148,10 +148,7 @@ Defaults: `WEB_HOST=127.0.0.1`, `WEB_PORT=4632` unless changed via settings or `
   "timezone": "UTC+0",
   "heartbeat": {
     "enabled": true,
-    "interval": 15,
-    "prompt": "Check git status and summarize recent changes."
-    // OR use a file path:
-    // "prompt": "prompts/heartbeat.md"
+    "interval": 15
   },
   "telegram": {
     "token": "123456:ABC-DEF...",
@@ -166,10 +163,8 @@ Defaults: `WEB_HOST=127.0.0.1`, `WEB_PORT=4632` unless changed via settings or `
 ```
 - `model` — Claude model to use (`opus`, `sonnet`, `haiku`, or full model ID). Empty string uses default.
 - `timezone` — canonical app timezone as UTC offset text (example: `UTC+1`, `UTC-5`, `UTC+03:30`). Heartbeat windows, jobs, and UI all use this timezone.
-- `heartbeat.enabled` — whether the recurring heartbeat runs
+- `heartbeat.enabled` — whether the recurring heartbeat runs, using `.claude/claudeclaw/prompts/HEARTBEAT.md` to replace the built-in heartbeat template for this project.
 - `heartbeat.interval` — minutes between heartbeat runs
-- `heartbeat.prompt` — the prompt sent to Claude on each heartbeat. Can be an inline string or a file path ending in `.md`, `.txt`, or `.prompt` (relative to project root). File contents are re-read on each tick, so edits take effect without restarting the daemon.
-- Heartbeat template override (optional) — create `.claude/claudeclaw/prompts/HEARTBEAT.md` to replace the built-in heartbeat template for this project.
 - `telegram.token` — Telegram bot token from @BotFather
 - `telegram.allowedUserIds` — array of numeric Telegram user IDs allowed to interact
 - `security.level` — one of: `locked`, `strict`, `moderate`, `unrestricted`
@@ -192,7 +187,7 @@ Jobs are markdown files with cron schedule frontmatter and a prompt body:
 ---
 schedule: "0 9 * * *"
 ---
-Your prompt here. Claude will run this at the scheduled time.
+Your prompt here. The agent will run this at the scheduled time.
 ```
 - Schedule uses standard cron syntax: `minute hour day-of-month month day-of-week`
 - **Timezone-aware**: cron times are evaluated in the configured `timezone`. E.g. `0 9 * * *` with `timezone: "UTC+2"` fires at 9:00 AM local time.

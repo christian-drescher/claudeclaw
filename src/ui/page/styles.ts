@@ -791,8 +791,7 @@ export const pageStyles = String.raw`    :root {
       text-transform: uppercase;
       color: #bfd4ef;
     }
-    .hb-input,
-    .hb-textarea {
+    .hb-input {
       width: 100%;
       border-radius: 10px;
       border: 1px solid #ffffff2e;
@@ -802,13 +801,7 @@ export const pageStyles = String.raw`    :root {
       font-size: 13px;
       padding: 10px 11px;
     }
-    .hb-textarea {
-      min-height: 190px;
-      resize: vertical;
-      line-height: 1.4;
-    }
-    .hb-input:focus-visible,
-    .hb-textarea:focus-visible {
+    .hb-input:focus-visible {
       outline: 1px solid #7dc5ff88;
       outline-offset: 1px;
     }
