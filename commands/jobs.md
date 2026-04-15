@@ -28,7 +28,7 @@ Create a new cron job interactively.
    - "When should it run?" (header: "Schedule", options: "Every hour (0 * * * *)", "Every 6 hours (0 */6 * * *)", "Daily at 9am (0 9 * * *)", "Daily at midnight (0 0 * * *)")
 
 2. Then ask:
-   - "What prompt should Claude execute?" (header: "Prompt", options: suggest 2-3 prompts relevant to the project context)
+   - "What prompt should the agent execute?" (header: "Prompt", options: suggest 2-3 prompts relevant to the project context)
 
 3. Create the job file at `.claude/claudeclaw/jobs/<name>.md` with this exact format:
    ```markdown
@@ -87,7 +87,7 @@ Jobs live in `.claude/claudeclaw/jobs/` as markdown files:
 schedule: "0 9 * * *"
 recurring: true
 ---
-Your prompt here. Claude will run this at the scheduled time.
+Your prompt here. The agent will run this at the scheduled time.
 ```
 
 **Cron syntax**: `minute hour day-of-month month day-of-week`

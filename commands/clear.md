@@ -2,7 +2,7 @@
 description: Clear session and start fresh
 ---
 
-Clear the current Claude session by backing it up and restarting the daemon with a fresh session.
+Clear the current session by backing it up and restarting the daemon with a fresh session.
 
 Run:
 ```bash

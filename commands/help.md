@@ -46,7 +46,7 @@ Display this help information to the user:
 ---
 schedule: "0 9 * * *"
 ---
-Your prompt here. Claude will run this at the scheduled time.
+Your prompt here. The agent will run this at the scheduled time.
 ```
 
 Schedule uses standard cron syntax: `minute hour day-of-month month day-of-week`
