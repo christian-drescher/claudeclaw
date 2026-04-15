@@ -2,13 +2,15 @@ This is my public fork of <a href="https://github.com/moazbuilds/claudeclaw/">mo
 
 ## How does this vary from upstream?
 
-I started this fork to submit a pull request against upstream when I realized that some other PRs are also awaiting integration that I didn't want to wait for.  I also plan to adjust the project more to my specific needs and learn along the way. Current differences:
+I started this fork to submit pull requests against upstream when I realized that some other PRs are also awaiting integration that I didn't want to wait for. I also plan to adjust the project more to my specific needs and learn along the way. Current differences:
 - **IDENTITY.md** in the agent's project directory is elevated to system prompt level at every invocation; not using `CLAUDE.md` for persisting assistant's identity
 - **Telegram only**
 - **No fallback model**, resort to *extra usage* for paid Claude plans instead
 - **No audio transciption** (should be handled via skills or MCP)
 - **File attachment support**
 - **Reporting Claude errors**
+- **Fixes** empty prompt templates in system prompt
+- **Fixes** `HEARTBEAT_OK` from leaking into Telegram channel
 
 ## Getting Started
 
@@ -29,6 +31,20 @@ Then open a Claude Code session and run:
 /claudeclaw:start
 ```
 The setup wizard walks you through model, heartbeat, Telegram, and security, then your daemon is live with a web dashboard.
+
+### First Steps
+- Verify `IDENTITY.md`, edit `CLAUDE.md` for workspace structure
+- Consider moving auto-memory into `memory/` in the agent's workspace; set <a href="https://code.claude.com/docs/en/memory#storage-location">autoMemoryDirectory</a> in `.claude/settings.local.json`
+
+### Useful tools/skills (Linux)
+- Web search via the Brave Search API
+- Web browsing via `playwright` in docker
+- Calendar access via `vdirsyncer` and `khal`
+- Shared notes via `obsidian-headless`
+- Smart home integration via `mosquitto` (MQTT client)
+- Integration with other cloud LLMs or image generation via openrouter
+- Local image generation via Stable Diffusion (**TODO** move to *SD.next*)
+- Documentation for popular third-party libraries, SDK or API, via `chub`
 
 ## Update
 
@@ -54,8 +70,6 @@ claude plugin update claudeclaw@claudeclaw --scope local
 - **Security Levels:** Four access levels from read-only to full system access.
 - **Model Selection:** Switch models based on your workload.
 
-## Next steps
-- Move Auto-Memory into `workspace/`; set <a href="https://code.claude.com/docs/en/memory#storage-location">autoMemoryDirectory</a> locally
-- Learn more about the plugin's architecture, and use of `prompts/`
-- Consider adding **file response**; see PR<a href="https://github.com/moazbuilds/claudeclaw/pull/23">23</a>
+## Future Work / TODO
+- Memory get's cluttered over time. Define a skill to clean this up.
 - Find out how this relates to <a href="https://code.claude.com/docs/en/channels">channels</a> in Claude Code (currently in research preview)
