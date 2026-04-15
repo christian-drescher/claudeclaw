@@ -321,7 +321,7 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
     // "You are running inside ClaudeClaw.",
   ];
 
-  // Load the project's IDENTITY.md if it exists
+  // Load the project's IDENTITY.md (written by ensureProjectClaudeMd() before any execClaude call)
   if (existsSync(IDENTITY_MD)) {
     try {
       const claudeMd = await Bun.file(IDENTITY_MD).text();
@@ -329,9 +329,6 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
     } catch (e) {
       console.error(`[${new Date().toLocaleTimeString()}] Failed to read project IDENTITY.md:`, e);
     }
-  } else {
-    const promptContent = await loadPrompts();
-    if (promptContent) appendParts.push(promptContent);
   }
 
   if (security.level !== "unrestricted") appendParts.push(DIR_SCOPE_PROMPT);
@@ -465,6 +462,6 @@ export async function bootstrap(): Promise<void> {
   if (existing) return;
 
   console.log(`[${new Date().toLocaleTimeString()}] Bootstrapping new session...`);
-  await execClaude("bootstrap", "Wakeup, my friend!");
+  await execClaude("bootstrap", "Wake up! New session start.");
   console.log(`[${new Date().toLocaleTimeString()}] Bootstrap complete — session is live.`);
 }
