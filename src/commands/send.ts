@@ -33,24 +33,28 @@ export async function send(args: string[]) {
       process.exit(1);
     }
 
-    const text = result.exitCode === 0
-      ? result.stdout || "(empty)"
-      : `error (exit ${result.exitCode}): ${result.stderr || "Unknown"}`;
+    if (result.exitCode === 0 && !result.stdout?.trim()) {
+      console.log("Empty response — skipping Telegram send.");
+    } else {
+      const text = result.exitCode === 0
+        ? result.stdout
+        : `error (exit ${result.exitCode}): ${result.stderr || "Unknown"}`;
 
-    for (const userId of userIds) {
-      const res = await fetch(
-        `https://api.telegram.org/bot${token}/sendMessage`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: userId, text }),
+      for (const userId of userIds) {
+        const res = await fetch(
+          `https://api.telegram.org/bot${token}/sendMessage`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: userId, text }),
+          }
+        );
+        if (!res.ok) {
+          console.error(`Failed to send to Telegram user ${userId}: ${res.statusText}`);
         }
-      );
-      if (!res.ok) {
-        console.error(`Failed to send to Telegram user ${userId}: ${res.statusText}`);
       }
+      console.log("Sent to Telegram.");
     }
-    console.log("Sent to Telegram.");
   }
 
   if (result.exitCode !== 0) process.exit(result.exitCode);

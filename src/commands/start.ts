@@ -457,8 +457,9 @@ export async function start(args: string[] = []) {
 
   function forwardToTelegram(label: string, result: { exitCode: number; stdout: string; stderr: string }) {
     if (!telegramSend || currentSettings.telegram.allowedUserIds.length === 0) return;
+    if (result.exitCode === 0 && !result.stdout?.trim()) return;
     const text = result.exitCode === 0
-      ? `${label ? `[${label}]\n` : ""}${result.stdout || "(empty)"}`
+      ? `${label ? `[${label}]\n` : ""}${result.stdout}`
       : `${label ? `[${label}] ` : ""}error (exit ${result.exitCode}): ${extractRuntimeErrorDetail(result)}`;
     for (const userId of currentSettings.telegram.allowedUserIds) {
       telegramSend(userId, text).catch((err) =>
