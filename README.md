@@ -2,15 +2,17 @@ This is my public fork of <a href="https://github.com/moazbuilds/claudeclaw/">mo
 
 ## How does this vary from upstream?
 
-I started this fork to submit pull requests against upstream when I realized that some other PRs are also awaiting integration that I didn't want to wait for. I also plan to adjust the project more to my specific needs and learn along the way. Current differences:
-- **IDENTITY.md** in the agent's project directory is elevated to system prompt level at every invocation; not using `CLAUDE.md` for persisting assistant's identity
+I started this fork to submit pull requests against upstream when I realized that some other PRs are also awaiting integration that I didn't want to wait for. I also plan to adjust the project more to my specific needs and learn along the way. Differences compared to when the fork was started:
+- **`IDENTITY.md`** and *not* `CLAUDE.md` in the agent's project directory *holds the agent's identity* and is elevated to system prompt level at every invocation
+- **Fixes** superfluous insertion of the package's prompt templase into the system prompt
+- **Fixes** `CLAUDE.md` used as intended (Claude Code's memory)
+- **Fixes** `HEARTBEAT_OK` from leaking into Telegram channel
+- **Fixes** forwarding `(empty response)` to the Telegram channel
 - **Telegram only**
 - **No fallback model**, resort to *extra usage* for paid Claude plans instead
 - **No audio transciption** (should be handled via skills or MCP)
 - **File attachment support**
 - **Reporting Claude errors**
-- **Fixes** empty prompt templates in system prompt
-- **Fixes** `HEARTBEAT_OK` from leaking into Telegram channel
 
 ## Getting Started
 
