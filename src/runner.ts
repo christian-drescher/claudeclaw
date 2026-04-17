@@ -23,7 +23,7 @@ const CLAUDECLAW_BLOCK_END = "<!-- claudeclaw:managed:end -->";
  */
 const COMPACT_WARN_THRESHOLD = 25;
 const COMPACT_TIMEOUT_ENABLED = false; // default to false to avoid unexpected auto-compacts; can be enabled in config
-const CLAUDE_TIMEOUT_MS = 5 * 60 * 1000;
+const CLAUDE_TIMEOUT_MS = 20 * 60 * 1000;
 
 export type CompactEvent =
   | { type: "warn"; turnCount: number }
