@@ -23,7 +23,6 @@ const CLAUDECLAW_BLOCK_END = "<!-- claudeclaw:managed:end -->";
  */
 const COMPACT_WARN_THRESHOLD = 25;
 const COMPACT_TIMEOUT_ENABLED = false; // default to false to avoid unexpected auto-compacts; can be enabled in config
-const CLAUDE_TIMEOUT_MS = 20 * 60 * 1000;
 
 export type CompactEvent =
   | { type: "warn"; turnCount: number }
@@ -72,7 +71,7 @@ async function runClaudeOnce(
   baseArgs: string[],
   model: string,
   baseEnv: Record<string, string>,
-  timeoutMs: number = CLAUDE_TIMEOUT_MS
+  timeoutMs: number
 ): Promise<{ rawStdout: string; stderr: string; exitCode: number }> {
   const args = [...baseArgs];
   if (model.trim()) args.push("--model", model.trim());
@@ -273,7 +272,7 @@ export async function compactCurrentSession(): Promise<{ success: boolean; messa
   const securityArgs = buildSecurityArgs(settings.security);
   const { CLAUDECODE: _, ...cleanEnv } = process.env;
   const baseEnv = { ...cleanEnv } as Record<string, string>;
-  const timeoutMs = CLAUDE_TIMEOUT_MS;
+  const timeoutMs = settings.sessionTimeoutMs;
 
   const ok = await runCompact(
     existing.sessionId,
@@ -296,9 +295,9 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const logFile = join(LOGS_DIR, `${name}-${timestamp}.log`);
 
-  const { security, model } = getSettings();
+  const { security, model, sessionTimeoutMs } = getSettings();
   const securityArgs = buildSecurityArgs(security);
-  const timeoutMs = CLAUDE_TIMEOUT_MS;
+  const timeoutMs = sessionTimeoutMs;
 
   console.log(
     `[${new Date().toLocaleTimeString()}] Running: ${name} (${isNew ? "new session" : `resume ${existing.sessionId.slice(0, 8)}`}, security: ${security.level})`

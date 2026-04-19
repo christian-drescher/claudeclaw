@@ -7,8 +7,8 @@ I started this fork to submit pull requests against upstream when I realized tha
 - **Fixes** superfluous insertion of the package's prompt templase into the system prompt
 - **Fixes** `CLAUDE.md` used as intended (Claude Code's memory)
 - **Fixes** `HEARTBEAT_OK` from leaking into Telegram channel
-- **Fixes** forwarding `(empty response)` to the Telegram channel
-- **Fixes** Claude subprocess timeout increased to 20 minutes
+- **Fixes** `(empty response)` from leaking into the Telegram channel
+- **Fixes** Claude subprocess timeout increased to 30 minutes, and configurable
 - **Telegram only**
 - **No fallback model**, resort to *extra usage* for paid Claude plans instead
 - **No audio transciption** (should be handled via skills or MCP)

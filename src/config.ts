@@ -8,6 +8,8 @@ const SETTINGS_FILE = join(HEARTBEAT_DIR, "settings.json");
 const JOBS_DIR = join(HEARTBEAT_DIR, "jobs");
 const LOGS_DIR = join(HEARTBEAT_DIR, "logs");
 
+export const CLAUDE_TIMEOUT_MS = 30 * 60 * 1000;
+
 const DEFAULT_SETTINGS: Settings = {
   model: "",
   timezone: "UTC",
@@ -21,6 +23,7 @@ const DEFAULT_SETTINGS: Settings = {
   telegram: { token: "", allowedUserIds: [] },
   security: { level: "moderate", allowedTools: [], disallowedTools: [] },
   web: { enabled: false, host: "127.0.0.1", port: 4632 },
+  sessionTimeoutMs: CLAUDE_TIMEOUT_MS,
 };
 
 export interface HeartbeatExcludeWindow {
@@ -61,6 +64,7 @@ export interface Settings {
   telegram: TelegramConfig;
   security: SecurityConfig;
   web: WebConfig;
+  sessionTimeoutMs: number;
 }
 
 export interface WebConfig {
@@ -125,6 +129,9 @@ function parseSettings(raw: Record<string, any>): Settings {
       host: raw.web?.host ?? "127.0.0.1",
       port: Number.isFinite(raw.web?.port) ? Number(raw.web.port) : 4632,
     },
+    sessionTimeoutMs: typeof raw.sessionTimeoutMs === "number" && raw.sessionTimeoutMs > 0
+      ? raw.sessionTimeoutMs
+      : CLAUDE_TIMEOUT_MS,
   };
 }
 
