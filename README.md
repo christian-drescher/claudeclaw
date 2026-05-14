@@ -6,6 +6,7 @@ I started this fork to submit pull requests against upstream when I realized tha
 - **`IDENTITY.md`** and *not* `CLAUDE.md` in the agent's project directory *holds the agent's identity* and is elevated to system prompt level at every invocation
 - **Fixes** superfluous insertion of the package's prompt templase into the system prompt
 - **Fixes** `CLAUDE.md` used as intended (Claude Code's memory)
+- **Fixes** `MEMORY.md` is elevated to system prompt level at every invocation
 - **Fixes** `HEARTBEAT_OK` from leaking into Telegram channel
 - **Fixes** `(empty response)` from leaking into the Telegram channel
 - **Fixes** Claude subprocess timeout increased to 30 minutes, and configurable

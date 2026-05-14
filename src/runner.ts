@@ -12,7 +12,7 @@ const HEARTBEAT_PROMPT_FILE = join(PROMPTS_DIR, "heartbeat", "HEARTBEAT.md");
 // Project-level prompt overrides live here (gitignored, user-owned)
 const PROJECT_PROMPTS_DIR = join(process.cwd(), ".claude", "claudeclaw", "prompts");
 const IDENTITY_MD = join(process.cwd(), "IDENTITY.md");
-const HISTORY_MD = join(process.cwd(), "memory/HISTORY.md");
+const MEMORY_MD = join(process.cwd(), "memory/MEMORY.md");
 const LEGACY_IDENTITY_MD = join(process.cwd(), ".claude", "IDENTITY.md");
 const CLAUDECLAW_BLOCK_START = "<!-- claudeclaw:managed:start -->";
 const CLAUDECLAW_BLOCK_END = "<!-- claudeclaw:managed:end -->";
@@ -330,11 +330,11 @@ async function execClaude(name: string, prompt: string): Promise<RunResult> {
       console.error(`[${new Date().toLocaleTimeString()}] Failed to read project IDENTITY.md:`, e);
     }
     try {
-      const historyMd = await Bun.file(HISTORY_MD).text();
-      if (historyMd.trim()) appendParts.push(historyMd.trim());
+      const memoryMd = await Bun.file(MEMORY_MD).text();
+      if (memoryMd.trim()) appendParts.push(memoryMd.trim());
     } catch (e) {
       if (!isNotFoundError(e)) {
-        console.error(`[${new Date().toLocaleTimeString()}] Failed to read HISTORY.md:`, e);
+        console.error(`[${new Date().toLocaleTimeString()}] Failed to read MEMORY.md:`, e);
       }
     }
   }
